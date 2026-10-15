@@ -13,7 +13,7 @@ import java.util.List;
 public class GlobalExceptionHandler {
     @ExceptionHandler(RecursoNaoEncontradoException.class)
     public ResponseEntity<ErroResposta> naoEncontrado(RecursoNaoEncontradoException ex) {
-        return montar(httpStatus.NOT_FOUND, ex.getMessage(), List.of());
+        return montar(HttpStatus.NOT_FOUND, ex.getMessage(), List.of());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
