@@ -13,7 +13,7 @@ import java.util.List;
 public class GlobalExceptionHandler {
     @ExceptionHandler(RecursoNaoEncontradoException.class)
     public ResponseEntity<ErroResposta> naoEncontrado(RecursoNaoEncontradoException ex) {
-        return montar(httpStatus.NOT_FOUND, ex.getMessage(), List.of());
+        return montar(HttpStatus.NOT_FOUND, ex.getMessage(), List.of());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -29,6 +29,13 @@ public class GlobalExceptionHandler {
             return ResponseEntity.status(status)
                     .body(new ErroResposta(LocalDateTime.now(), status.value(), erro, detalhes));
             }
+
+    @ExceptionHandler(RegraNegocioException.class)
+    public ResponseEntity<ErroResposta> regraNegocio(RegraNegocioException ex) {
+        return montar(HttpStatus.CONFLICT, ex.getMessage(), List.of());
+        }
+
     }
+
 
 
