@@ -1,6 +1,10 @@
 package br.com.sistemas.chamados.entity;
 
 import jakarta.persistence.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import br.com.sistemas.chamados.dto.ChamadoResponse;
+import br.com.sistemas.chamados.service.ChamadoService;
 
 @Entity
 @Table(name="clientes")
