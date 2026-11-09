@@ -15,6 +15,8 @@ import br.com.sistemas.chamados.entity.Prioridade;
 import br.com.sistemas.chamados.entity.StatusChamado;
 import br.com.sistemas.chamados.service.ChamadoService;
 import jakarta.validation.Valid;
+import br.com.sistemas.chamados.dto.ChamadoDetalheResponse;
+
 
 @RestController
 @RequestMapping("/chamados")
@@ -32,6 +34,11 @@ public class ChamadoController {
         return ResponseEntity.created(URI.create("/chamados/" + criado.id())).body(criado);
     }
 
+    @GetMapping("/{id}")
+    public ChamadoDetalheResponse buscar(@PathVariable Long id) {
+        return service.buscar(id);
+    }
+
     @GetMapping
     public Page<ChamadoResponse> listar(
             @RequestParam(required = false) StatusChamado status,
@@ -39,11 +46,6 @@ public class ChamadoController {
             @RequestParam(required = false) Long clienteId,
             Pageable pageable) {
         return service.listar(status, prioridade, clienteId, pageable);
-    }
-
-    @GetMapping("/{id}")
-    public ChamadoResponse buscar(@PathVariable Long id) {
-        return service.buscar(id);
     }
 
     @PutMapping("/{id}")

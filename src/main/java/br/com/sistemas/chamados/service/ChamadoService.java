@@ -18,6 +18,10 @@ import br.com.sistemas.chamados.entity.Tecnico;
 import br.com.sistemas.chamados.exception.RecursoNaoEncontradoException;
 import br.com.sistemas.chamados.exception.RegraNegocioException;
 import br.com.sistemas.chamados.repository.ChamadoRepository;
+import java.util.List;
+import br.com.sistemas.chamados.dto.ChamadoDetalheResponse;
+import br.com.sistemas.chamados.dto.ComentarioResponse;
+import br.com.sistemas.chamados.repository.ComentarioRepository;
 
 @Service
 public class ChamadoService {
@@ -26,13 +30,24 @@ public class ChamadoService {
     private final ClienteService clienteService;
     private final CategoriaService categoriaService;
     private final TecnicoService tecnicoService;
+    private final ComentarioRepository comentarioRepository;
 
     public ChamadoService(ChamadoRepository repository, ClienteService clienteService,
-                          CategoriaService categoriaService, TecnicoService tecnicoService) {
+                          CategoriaService categoriaService, TecnicoService tecnicoService, ComentarioRepository comentarioRepository) {
         this.repository = repository;
         this.clienteService = clienteService;
         this.categoriaService = categoriaService;
         this.tecnicoService = tecnicoService;
+        this.comentarioRepository = comentarioRepository;
+    }
+
+    @Transactional(readOnly = true)
+    public ChamadoDetalheResponse buscar(Long id) {
+        Chamado chamado = buscarEntity(id);
+        List<ComentarioResponse> comentarios = comentarioRepository
+                .findByChamadoIdOrderByDataAsc(id).stream()
+                .map(ComentarioResponse::de).toList();
+        return ChamadoDetalheResponse.de(chamado, comentarios);
     }
 
     @Transactional
@@ -54,11 +69,6 @@ public class ChamadoService {
     public Page<ChamadoResponse> listarPorCliente(Long clienteId, Pageable pageable) {
         clienteService.buscarEntity(clienteId); // garante 404 se o cliente não existe
         return repository.filtrar(null, null, clienteId, pageable).map(ChamadoResponse::de);
-    }
-
-    @Transactional(readOnly = true)
-    public ChamadoResponse buscar(Long id) {
-        return ChamadoResponse.de(buscarEntity(id));
     }
 
     @Transactional
@@ -102,7 +112,7 @@ public class ChamadoService {
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Chamado " + id + " não encontrado"));
     }
 
-    private void validarNaoFechado(Chamado chamado) {
+    public void validarNaoFechado(Chamado chamado) {
         if (chamado.getStatus() == StatusChamado.FECHADO) {
             throw new RegraNegocioException("Chamado " + chamado.getId() + " está fechado e não pode ser alterado");
         }
